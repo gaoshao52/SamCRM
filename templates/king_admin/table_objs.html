@@ -8,6 +8,31 @@
             <h3 class="panel-title">Panel title</h3>
         </div>
         <div class="panel-body">
+
+            <div class="row">
+                {% for condtion in admin_class.list_filters %}
+                    <div class="col-xs-2">
+                        {{ condtion }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="row">
+                <form class="" method="get">
+                    {% for condtion in admin_class.list_filters %}
+                        <div class="col-xs-2">
+                            {% render_filter_ele condtion admin_class filer_condition %}
+                        </div>
+                    {% endfor %}
+                    <div class="col-xs-1">
+                        <button type="submit" class="btn btn-success">检索</button>
+                    </div>
+                </form>
+
+
+
+            </div>
+
             <table class="table table-hover">
                 <thead>
                 <tr>
@@ -16,16 +41,101 @@
                     {% endfor %}
                 </tr>
                 </thead>
+                <tfoot>
+                    <tr>
+                        <td>
+                            <span>总计：{{ query_sets.paginator.count }}</span>
+                        </td>
+                    </tr>
+                </tfoot>
                 <tbody>
-                {% get_query_sets admin_class as query_sets %}
+                {#                {% get_query_sets admin_class as query_sets %}#}
                 {% for obj in query_sets %}
                     <tr>
-{#                        {{ obj }}#}
                         {% build_table_row obj admin_class %}
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
+
+
+            {#            <nav aria-label="Page navigation">#}
+            {#                <ul class="pagination">#}
+            {##}
+            {#                    {% if query_sets.has_previous %}#}
+            {#                        <li>#}
+            {#                            <a href="?page={{ query_sets.previous_page_number }}" aria-label="Previous">#}
+            {#                                <span aria-hidden="true">上一页</span>#}
+            {#                            </a>#}
+            {#                        </li>#}
+            {#                    {% else %}#}
+            {#                        <li>#}
+            {#                            <a href="?page={{ query_sets.number }}" aria-label="Previous">#}
+            {#                                <span aria-hidden="true">上一页</span>#}
+            {#                            </a>#}
+            {#                        </li>#}
+            {#                    {% endif %}#}
+            {##}
+            {##}
+            {##}
+            {#                    {% for pnum in query_sets.paginator.page_range %}#}
+            {#                        {% if query_sets.number == pnum %}#}
+            {#                            <li class="active"><a href="?page={{ pnum }}">{{ pnum }}</a></li>#}
+            {##}
+            {#                        {% else %}#}
+            {#                            <li><a href="?page={{ pnum }}">{{ pnum }}</a></li>#}
+            {#                        {% endif %}#}
+            {##}
+            {#                    {% endfor %}#}
+            {##}
+            {#                    {% if query_sets.has_next %}#}
+            {#                        <li>#}
+            {#                            <a href="?page={{ query_sets.next_page_number }}" aria-label="Next">#}
+            {#                                <span aria-hidden="true">下一页</span>#}
+            {#                            </a>#}
+            {#                        </li>#}
+            {#                    {% else %}#}
+            {#                        <li>#}
+            {#                            <a href="?page={{ query_sets.number }}" aria-label="Next">#}
+            {#                                <span aria-hidden="true">下一页</span>#}
+            {#                            </a>#}
+            {#                        </li>#}
+            {#                    {% endif %}#}
+            {##}
+            {##}
+            {#                </ul>#}
+            {#            </nav>#}
+
+
+
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+
+                    {% if query_sets.has_previous %}
+                        <li>
+                            <a href="?page={{ query_sets.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">上一页</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+{#                    {% for loop_counter in query_sets.paginator.page_range %}#}
+{#                        {% render_page_ele loop_counter query_sets filer_condition %}#}
+{#                    {% endfor %}#}
+
+                    {% build_paginators query_sets filer_condition %}
+
+
+                    {% if query_sets.has_next %}
+                        <li>
+                            <a href="?page={{ query_sets.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">下一页</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+
         </div>
     </div>
 {% endblock %}
