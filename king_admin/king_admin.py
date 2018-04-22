@@ -8,13 +8,15 @@ enabled_admins = {'app_name': {'table_name01': admin_class, 'table_name02': admi
 class BaseAdmin(object):
     list_display = []
     list_filters = []
+    search_fields = []
     list_per_page = 20
 
 class CustomerAdmin(BaseAdmin):
-    list_display = ("id", "qq", "source", "consultant", "consult_course", "content", "status", "date")
+    list_display = ("id", "qq", "name","source", "consultant", "consult_course", "content", "status", "date")
     # model = models.Customer
-    list_filters = ('source', 'consultant', 'consult_course', 'status')
-    list_per_page = 1
+    list_filters = ('source', 'consultant', 'consult_course', 'status', 'date')
+    list_per_page = 3
+    search_fields = ('qq', 'name', 'consultant__name')
 
 class CustomerFollowUpAdmin(BaseAdmin):
     list_display = ('customer', 'consultant', 'date')

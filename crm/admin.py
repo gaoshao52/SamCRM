@@ -3,12 +3,13 @@ from crm import models
 # Register your models here.
 
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ("id", "qq", "source", "consultant", "content", "status", "date")
+    list_display = ("id", "qq", "name","source", "consultant", "content", "status", "date")
     list_filter = ('source', 'consultant', 'date')
-    search_fields = ('qq', 'name')
+    search_fields = ('qq', 'name', )
     raw_id_fields = ('consult_course',)
     filter_horizontal = ('tags',)
     list_editable = ('status',)
+    list_per_page = 5
 
 
 admin.site.register(models.Customer, CustomerAdmin)

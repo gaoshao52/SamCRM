@@ -3,6 +3,8 @@ import importlib
 from king_admin import king_admin
 from django.core.paginator import Paginator
 
+from king_admin import forms
+
 from king_admin import utils
 # Create your views here.
 
@@ -20,7 +22,7 @@ def index(request):
 
 
 def display_table_objs(request, app_name, table_name):
-
+    '''展示某一张表的数据'''
     # print("--->", app_name, table_name)
     # models_module = importlib.import_module('%s.models'%app_name)
 
@@ -28,16 +30,35 @@ def display_table_objs(request, app_name, table_name):
 
 
     # object_list = admin_class.model.objects.all()
-    object_list, filer_condition = utils.table_filter(request, admin_class)
-    print(object_list)
+    object_list, filer_condition = utils.table_filter(request, admin_class)  # 获取过滤数据
+
+    object_list = utils.table_search(request, admin_class, object_list)
+
+    object_list, orderby_key = utils.table_sort(request, admin_class, object_list)  # 获取排序数据
+
+
+
+
     paginator = Paginator(object_list, admin_class.list_per_page)  # Show 25 contacts per page
 
-    page = request.GET.get('page')
-    query_sets = paginator.get_page(page)  # 同事具有querysets 和page 的方法
+    page = request.GET.get('page')  # 获取page number
+
+    query_sets = paginator.get_page(page)  # 同时具有querysets 和page 的方法
 
 
 
     return render(request, "king_admin/table_objs.html", {'admin_class': admin_class,
                                                           "query_sets": query_sets,
                                                           "filer_condition": filer_condition,
+                                                          "orderby_key": orderby_key,
+                                                          "previous_orderby": request.GET.get("o", ""),
+                                                          "search_text": request.GET.get("_q", ""),
                                                           })
+
+
+def table_obj_change(request, app_name, table_name, obj_id):
+    '''修改一条信息'''
+    admin_class = king_admin.enabled_admins[app_name][table_name]
+    model_form_class = forms.create_model_form(request, admin_class)
+
+    return render(request, "king_admin/table_obj_change.html", {"model_form_class": model_form_class})
