@@ -1,8 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import importlib
 from king_admin import king_admin
 from django.core.paginator import Paginator
-
+from django.urls import reverse
 from king_admin import forms
 
 from king_admin import utils
@@ -57,8 +57,34 @@ def display_table_objs(request, app_name, table_name):
 
 
 def table_obj_change(request, app_name, table_name, obj_id):
-    '''修改一条信息'''
+    '''修改客户信息'''
     admin_class = king_admin.enabled_admins[app_name][table_name]
-    model_form_class = forms.create_model_form(request, admin_class)
+    model_form_class = forms.create_model_form(request, admin_class)  # 获取生成的ModelForm类
 
-    return render(request, "king_admin/table_obj_change.html", {"model_form_class": model_form_class})
+    obj = admin_class.model.objects.get(id=obj_id)
+
+    if request.method == "POST":
+        form_obj = model_form_class(request.POST, instance=obj)  # 更新
+        if form_obj.is_valid():  #检查格式
+            form_obj.save()   # 更新到数据库
+
+    else:
+        form_obj = model_form_class(instance=obj)
+
+    return render(request, "king_admin/table_obj_change.html", {"form_obj": form_obj, "admin_class": admin_class})
+
+def table_obj_add(request, app_name, table_name):
+    '''添加客户信息'''
+    admin_class = king_admin.enabled_admins[app_name][table_name]
+    model_form_class = forms.create_model_form(request, admin_class)  # 获取生成的ModelForm类
+    form_obj = model_form_class()
+
+    if request.method == "POST":
+        form_obj = model_form_class(request.POST)  # 更新
+        if form_obj.is_valid():  # 检查格式
+            form_obj.save()  # 更新到数据库
+            print(reverse("table_objs", args=(app_name, table_name)))
+            return redirect(reverse("table_objs", args=(app_name, table_name)))
+
+
+    return render(request, "king_admin/table_obj_add.html", {"form_obj": form_obj})

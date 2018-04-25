@@ -161,3 +161,9 @@ def build_table_header_column(column, orderby_key ,filer_condition):
 
     return mark_safe(ele.format(orderby_key=orderby_key, column=column, iron=iron, filter=filter))
 
+
+@register.simple_tag
+def get_model_name(admin_class):
+    '''生成表名'''
+    return admin_class.model._meta.verbose_name
+

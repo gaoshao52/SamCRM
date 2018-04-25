@@ -5,7 +5,13 @@
 
     <div class="panel panel-info">
         <div class="panel-heading">
-            <h3 class="panel-title">Panel title</h3>
+            <h3 class="panel-title">
+                {% get_model_name admin_class %}
+                <a href="{{ request.path }}add/" class="pull-right">
+                    Add
+                </a>
+            </h3>
+
         </div>
         <div class="panel-body">
 
@@ -19,14 +25,14 @@
             <form class="" method="get">
                 <div class="row">
 
-                        {% for condtion in admin_class.list_filters %}
-                            <div class="col-xs-2">
-                                {% render_filter_ele condtion admin_class filer_condition %}
-                            </div>
-                        {% endfor %}
-                        <div class="col-xs-1">
-                            <button type="submit" class="btn btn-success">检索</button>
+                    {% for condtion in admin_class.list_filters %}
+                        <div class="col-xs-2">
+                            {% render_filter_ele condtion admin_class filer_condition %}
                         </div>
+                    {% endfor %}
+                    <div class="col-xs-1">
+                        <button type="submit" class="btn btn-success">检索</button>
+                    </div>
                 </div>
                 <div class="row" style="margin-top: 10px">
                     <div class="col-xs-2">
@@ -44,16 +50,16 @@
                 <tr>
                     {% for column in admin_class.list_display %}
                         {% build_table_header_column column orderby_key filer_condition %}
-{#                        <th><a href="?o={{ column }}">{{ column }}</a></th>#}
+                        {#                        <th><a href="?o={{ column }}">{{ column }}</a></th>#}
                     {% endfor %}
                 </tr>
                 </thead>
                 <tfoot>
-                    <tr>
-                        <td>
-                            <span>总计：{{ query_sets.paginator.count }}</span>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>
+                        <span>总计：{{ query_sets.paginator.count }}</span>
+                    </td>
+                </tr>
                 </tfoot>
                 <tbody>
                 {#                {% get_query_sets admin_class as query_sets %}#}
@@ -126,9 +132,9 @@
                         </li>
                     {% endif %}
 
-{#                    {% for loop_counter in query_sets.paginator.page_range %}#}
-{#                        {% render_page_ele loop_counter query_sets filer_condition %}#}
-{#                    {% endfor %}#}
+                    {#                    {% for loop_counter in query_sets.paginator.page_range %}#}
+                    {#                        {% render_page_ele loop_counter query_sets filer_condition %}#}
+                    {#                    {% endfor %}#}
 
                     {% build_paginators query_sets filer_condition previous_orderby search_text %}
 

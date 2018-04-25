@@ -11,7 +11,8 @@ def table_filter(request, admin_class):
         if v:
             filer_condition[k] = v
 
-    return admin_class.model.objects.filter(**filer_condition), filer_condition
+    return admin_class.model.objects.filter(**filer_condition).order_by\
+               ("-%s"%admin_class.ordering if admin_class.ordering else "-id"), filer_condition
 
 def table_sort(request, admin_class, obj):
     '''数据排序'''

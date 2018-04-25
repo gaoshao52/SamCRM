@@ -1,10 +1,52 @@
 {% extends "king_admin/table_index.html" %}
 {% load tags %}
 
+{% block extra-css-resources %}
+    <style>
+        .filter-select-box{
+            height: 250px!important;
+            width: 100%;
+        }
+    </style>
+{% endblock %}
+
+
 {% block container %}
 
-    table_change
+    <form class="form-horizontal" method="post">
+        <span style="color: red">{{ form_obj.errors }}</span>
+        {% csrf_token %}
+        {% for field in form_obj %}
+            <div class="form-group">
+                <label for="inputEmail3" class="col-sm-2 control-label" style="font-weight: normal">
+                    {% if field.field.required %}
+                        <b>{{ field.label }}</b>
+                    {% else %}
+                        {{ field.label }}
+                    {% endif %}
+                </label>
+                <div class="col-sm-6">
+                    {% if field.name in admin_class.filter_horizontal %}
+                        <div class="col-md-5">
+                            <select name="" multiple class="filter-select-box"></select>
+                        </div>
+                        <div class="col-md-1">
+                            添加
+                        </div>
+                         <div class="col-md-5">
+                            <select name="" multiple class="filter-select-box"></select>
+                        </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+        <div class="form-group">
+            <div class="col-sm-8">
+                <button type="submit" class="btn btn-success pull-right">保存</button>
+            </div>
+        </div>
 
-    {{ model_form_class }}
-
+    </form>
 {% endblock %}
