@@ -71,7 +71,11 @@ def table_obj_change(request, app_name, table_name, obj_id):
     else:
         form_obj = model_form_class(instance=obj)
 
-    return render(request, "king_admin/table_obj_change.html", {"form_obj": form_obj, "admin_class": admin_class})
+    return render(request, "king_admin/table_obj_change.html", {"form_obj": form_obj,
+                                                                "admin_class": admin_class,
+                                                                "app_name": app_name,
+                                                                "table_name": table_name,
+                                                                })
 
 def table_obj_add(request, app_name, table_name):
     '''添加客户信息'''
@@ -87,4 +91,13 @@ def table_obj_add(request, app_name, table_name):
             return redirect(reverse("table_objs", args=(app_name, table_name)))
 
 
-    return render(request, "king_admin/table_obj_add.html", {"form_obj": form_obj})
+    return render(request, "king_admin/table_obj_add.html", {"form_obj": form_obj, "admin_class": admin_class})
+
+
+def table_obj_delete(request, app_name, table_name, obj_id):
+    '''删除客户数据'''
+    admin_class = king_admin.enabled_admins[app_name][table_name]
+    obj = admin_class.model.objects.get(id=obj_id)
+
+    return render(request, "king_admin/table_obj_delete.html", {"obj": obj,
+                                                                "admin_class": admin_class})

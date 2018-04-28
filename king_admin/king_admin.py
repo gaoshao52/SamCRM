@@ -19,7 +19,7 @@ class CustomerAdmin(BaseAdmin):
     list_filters = ('source', 'consultant', 'consult_course', 'status', 'date')
     list_per_page = 3
     search_fields = ('qq', 'name', 'consultant__name')
-    ordering = "qq"
+    # ordering = "qq"
     filter_horizontal = ('tags',)
 
 class CustomerFollowUpAdmin(BaseAdmin):

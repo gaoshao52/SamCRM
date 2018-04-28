@@ -13,7 +13,7 @@
 
 {% block container %}
 
-    <form class="form-horizontal" method="post">
+    <form class="form-horizontal" method="post" onsubmit="return selectAllChoseData();">
         <span style="color: red">{{ form_obj.errors }}</span>
         {% csrf_token %}
         {% for field in form_obj %}
@@ -28,13 +28,23 @@
                 <div class="col-sm-6">
                     {% if field.name in admin_class.filter_horizontal %}
                         <div class="col-md-5">
-                            <select name="" multiple class="filter-select-box"></select>
+                        {% get_m2m_obj_list admin_class field form_obj as m2m_obj_list %}
+                            <select id="id_{{ field.name }}_from" multiple class="filter-select-box">
+                                {% for item in m2m_obj_list %}
+                                <option ondblclick="MoveElementTo(this, 'id_{{ field.name }}_from','id_{{ field.name }}_to');" value="{{ item.id }}">{{ item.name }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                         <div class="col-md-1">
                             添加
                         </div>
                          <div class="col-md-5">
-                            <select name="" multiple class="filter-select-box"></select>
+                         {% get_m2m_selected_obj_list form_obj field as selected_object_list %}
+                            <select tag="chose_list" id="id_{{ field.name }}_to" name="{{ field.name }}" multiple class="filter-select-box">
+                                {% for item in selected_object_list %}
+                                <option ondblclick="MoveElementTo(this, 'id_{{ field.name }}_to' ,'id_{{ field.name }}_from');" value="{{ item.id }}">{{ item.name }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                     {% else %}
                         {{ field }}
@@ -44,9 +54,25 @@
         {% endfor %}
         <div class="form-group">
             <div class="col-sm-8">
+                <button type="button" class="btn btn-danger"><a href="{% url 'table_obj_delete' app_name table_name form_obj.instance.id %}">delete</a></button>
                 <button type="submit" class="btn btn-success pull-right">保存</button>
             </div>
         </div>
-
     </form>
+    <script>
+    function MoveElementTo(ele, current_id ,target_id) {
+        var opt_ele = "<option ondblclick=\"MoveElementTo(this, '"+target_id+"','"+current_id+"');\" value='"+$(ele).val()+"' >"+$(ele).text()+"</option>";
+
+        $("#" + target_id).append(opt_ele);
+        $(ele).remove();
+    }
+
+    function selectAllChoseData() {
+        $("select[tag='chose_list'] option").each(function () {
+            $(this).prop("selected", true);
+        });
+    }
+
+    </script>
+
 {% endblock %}

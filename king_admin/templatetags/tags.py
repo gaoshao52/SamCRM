@@ -167,3 +167,34 @@ def get_model_name(admin_class):
     '''生成表名'''
     return admin_class.model._meta.verbose_name
 
+@register.simple_tag
+def get_m2m_obj_list(admin_class, field, form_obj):
+    '''获取m2m数据对象'''
+
+    all_object_list = getattr(admin_class.model, field.name).rel.model.objects.all()  # 所有的数据对象
+
+
+    if form_obj.instance.id:
+
+        selected_object_list = getattr(form_obj.instance, field.name).all()  # 用户已选择的数据对象
+    else:
+        selected_object_list = []
+    standby_object_list = []
+    for item in all_object_list:
+        if item not in selected_object_list:
+            standby_object_list.append(item)
+
+    return standby_object_list
+
+@register.simple_tag
+def get_m2m_selected_obj_list(form_obj, field):
+    '''获取已选择的m2m数据'''
+
+    if form_obj.instance.id:
+        select_obj_list = getattr(form_obj.instance, field.name).all()
+    else:
+        select_obj_list = []
+
+    return select_obj_list
+
+
