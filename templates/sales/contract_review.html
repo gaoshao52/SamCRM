@@ -1,0 +1,36 @@
+{% extends 'index.html' %}
+
+{% block page-content %}
+    <div class="row col-lg-7">
+        学员缴费记录
+
+    </div>
+    <h3>学员基本信息审核</h3>
+    <div class="row">
+        <div class="col-lg-5">
+            {{ coustomer_form.as_p }}
+        </div>
+    </div>
+    <hr>
+    <h3>报名信息</h3>
+    <div class="row">
+        <div class="col-lg-5">
+            {{ enroll_form.as_p }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-5">
+            <a class="btn btn-danger" href="{% url 'enrollment_rejection' enroll_obj.id %}">驳回合同</a>
+            <a class="btn btn-success pull-right" href="{% url 'payment' enroll_obj.id %}">
+                审核通过
+            </a>
+        </div>
+    </div>
+   <hr>
+
+
+
+
+
+
+{% endblock %}

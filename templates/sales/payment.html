@@ -1,0 +1,25 @@
+{% extends 'index.html' %}
+
+{% block page-content %}
+<h1>学员缴费记录</h1>
+<form onsubmit="return SubmitPay();" class="form-horizontal col-lg-7" method="post">{% csrf_token %}
+    {{ payment_form.as_p }}
+
+
+
+                <button type="submit" class="btn btn-success pull-right">提交</button>
+
+
+</form>
+
+    {% block botton-js %}
+        <script>
+
+        function SubmitPay(){
+            $("form :disabled").prop("disabled", false);
+            return true;
+        }
+
+        </script>
+    {% endblock %}
+{% endblock %}

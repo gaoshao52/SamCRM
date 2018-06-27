@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="container">
+
+
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">报名入学</h3>
+            </div>
+
+            {% if status != 1 %}
+                <div class="panel-body">
+                    {{ customer_form.errors }}
+                    <form class="form-horizontal" method="post" onsubmit="return RegisterFormCheck();">{% csrf_token %}
+                        {% for field in customer_form %}
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">{{ field.label }}</label>
+                                <div class="col-sm-10">
+                                    {{ field }}
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        <hr>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">所报班级</label>
+                            <div class="col-sm-10">
+                                {{ enroll_obj.enrolled_class }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">课程费用</label>
+                            <div class="col-sm-10">
+                                {{ enroll_obj.enrolled_class.course.price }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">开课日期</label>
+                            <div class="col-sm-10">
+                                {{ enroll_obj.enrolled_class.start_date }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <pre style="height: 450px; overflow: auto">{{ enroll_obj.enrolled_class.contract.template }}</pre>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="contract_agreed">我已阅读协议所有条款
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+
+                                <button type="submit" class="btn btn-success pull-right">Sign in</button>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            {% else %}
+                <h2>感谢，报名表已经提交，您的合同将很快被审核，即将开启激动的自我提升之旅</h2>
+            {% endif %}
+        </div>
+
+
+        <form id="filedropzone" method="post" action="{{ request.path }}" class="dropzone dz-clickable" style="border: 1px solid black">{% csrf_token %}
+            <div class="dz-default dz-message">
+                <div class="dz-icon icon-wrap icon-circle icon-wrap-md">
+                    <i class="fa fa-cloud-upload fa-3x"></i>
+                </div>
+                <div>
+                    <p class="dz-text">把要提交的作业拖到这里</p>
+                    <p class="text-muted">上传前请将代码打包成.zip格式</p>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    {% block botton-js %}
+        <script>
+            function RegisterFormCheck() {
+                if($("form :checkbox").prop("checked")){
+                    $("form :disabled").removeAttr("disabled");
+                    return true;
+                }else{
+                    alert("必须同意所有条款");
+                    return false;
+                }
+            }
+
+        </script>
+    {% endblock %}
+
+{% endblock %}

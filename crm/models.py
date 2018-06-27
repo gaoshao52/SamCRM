@@ -1,13 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.models import (
+    BaseUserManager, AbstractBaseUser, PermissionsMixin
+)
+from django.utils.translation import gettext_lazy as _
+from django.utils.safestring import mark_safe
 # Create your models here.
 
 class Customer(models.Model):
     '''客户信息表'''
-    name = models.CharField(max_length=32, blank=True, null=True)
+    name = models.CharField(max_length=32, blank=True, null=True, help_text="报名后请改为真实密码")
     qq = models.CharField(max_length=64, unique=True)
     qq_name = models.CharField(max_length=64, blank=True, null=True)
     phone = models.CharField(max_length=64, blank=True, null=True)
+    id_num = models.CharField(max_length=64, blank=True, null=True)
+    email = models.EmailField(verbose_name="常用邮箱", blank=True, null=True)
     source_choices = ((0, '介绍'),
                       (1, 'QQ群'),
                       (2, '官网'),
@@ -103,6 +110,8 @@ class ClassList(models.Model):
                           (1, "面授（周末）"),
                           (2, "网络班"),
                           )
+    contract = models.ForeignKey("ContractTemplate", on_delete=models.CASCADE, blank=True, null=True)
+
     class_type = models.SmallIntegerField(choices=class_type_choices, verbose_name="班级类型")
     semester = models.PositiveSmallIntegerField(verbose_name="学期")
     teachers = models.ManyToManyField("UserProfile")
@@ -214,14 +223,103 @@ class Payment(models.Model):
 
 
 
-class UserProfile(models.Model):
-    '''账号表'''
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=32)
-    roles = models.ManyToManyField("Role", blank=True, null=True)
+# class UserProfile(models.Model):
+#     '''账号表'''
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     name = models.CharField(max_length=32)
+#     roles = models.ManyToManyField("Role", blank=True, null=True)
+#
+#     def __str__(self):
+#         return self.name
+
+
+class ContractTemplate(models.Model):
+    '''合同模板'''
+    name = models.CharField("合同名称", max_length=64, unique=True)
+    template = models.TextField()
 
     def __str__(self):
         return self.name
+
+class UserProfileManager(BaseUserManager):
+    def create_user(self, email, name, password=None):
+        """
+        Creates and saves a User with the given email, date of
+        birth and password.
+        """
+        if not email:
+            raise ValueError('Users must have an email address')
+
+        user = self.model(
+            email=self.normalize_email(email),
+            name=name,
+        )
+        user.is_active = True
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, name, password):
+        """
+        Creates and saves a superuser with the given email, date of
+        birth and password.
+        """
+        user = self.create_user(
+            email,
+            password=password,
+            name=name,
+        )
+        user.is_active = True
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
+
+
+
+
+class UserProfile(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(
+        verbose_name='email address',
+        max_length=255,
+        unique=True,
+    )
+    # date_of_birth = models.DateField()
+    password = models.CharField(_('password'), max_length=128, help_text=mark_safe('''<a href="password/">修改密码</a>'''))
+    name = models.CharField(max_length=32)
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+    roles = models.ManyToManyField("Role", blank=True, null=True)
+    objects = UserProfileManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name']
+
+    def get_full_name(self):
+        # The user is identified by their email address
+        return self.email
+
+    def get_short_name(self):
+        # The user is identified by their email address
+        return self.email
+
+    def __str__(self):              # __unicode__ on Python 2
+        return self.email
+
+    def has_perm(self, perm, obj=None):
+        "Does the user have a specific permission?"
+        # Simplest possible answer: Yes, always
+        return True
+
+    def has_module_perms(self, app_label):
+        "Does the user have permissions to view the app `app_label`?"
+        # Simplest possible answer: Yes, always
+        return True
+
+    @property
+    def is_staff(self):
+        "Is the user a member of staff?"
+        # Simplest possible answer: All admins are staff
+        return self.is_admin
 
 
 
@@ -239,6 +337,8 @@ class Role(models.Model):
 class Menu(models.Model):
     '''菜单'''
     name = models.CharField(max_length=32)
+    url_type_choices = ((0, 'alias'), (1, 'absolute_url'))
+    url_type = models.SmallIntegerField(choices=url_type_choices, default=0)
     url_name = models.CharField(max_length=64)
 
     def __str__(self):
